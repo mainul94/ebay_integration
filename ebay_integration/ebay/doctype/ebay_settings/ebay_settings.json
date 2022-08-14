@@ -9,8 +9,17 @@
   "enabled",
   "app_name",
   "client_id",
+  "client_secret",
+  "dev_id",
+  "ru_name",
+  "column_break_6",
+  "sandbox",
+  "gant_access",
   "scope",
-  "token"
+  "section_break_10",
+  "access_token",
+  "refresh_token",
+  "refresh_token_expired_at"
  ],
  "fields": [
   {
@@ -27,7 +36,9 @@
   {
    "fieldname": "client_id",
    "fieldtype": "Data",
-   "label": "Client ID"
+   "in_list_view": 1,
+   "label": "Client ID",
+   "reqd": 1
   },
   {
    "fieldname": "scope",
@@ -35,16 +46,67 @@
    "label": "Scope"
   },
   {
-   "fieldname": "token",
+   "fieldname": "client_secret",
+   "fieldtype": "Password",
+   "in_list_view": 1,
+   "label": "Client Secret",
+   "reqd": 1
+  },
+  {
+   "fieldname": "refresh_token",
    "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Refresh Token",
+   "read_only_depends_on": "refresh_token"
+  },
+  {
+   "fieldname": "dev_id",
+   "fieldtype": "Data",
+   "label": "Dev ID"
+  },
+  {
+   "default": "0",
+   "fieldname": "sandbox",
+   "fieldtype": "Check",
+   "label": "Sandbox"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "refresh_token_expired_at",
+   "fieldtype": "Datetime",
+   "label": "Refresh Token Expired At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "access_token",
+   "fieldtype": "Small Text",
+   "hidden": 1,
    "label": "Token",
-   "read_only_depends_on": "token"
+   "read_only_depends_on": "access_token"
+  },
+  {
+   "fieldname": "ru_name",
+   "fieldtype": "Data",
+   "label": "RU Name"
+  },
+  {
+   "fieldname": "gant_access",
+   "fieldtype": "Button",
+   "label": "Gant Access",
+   "options": "get_gant_url"
   }
  ],
  "in_create": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-08-12 18:50:27.482639",
+ "modified": "2022-08-14 16:39:38.248919",
  "modified_by": "Administrator",
  "module": "eBay",
  "name": "eBay Settings",
