@@ -49,20 +49,12 @@ class eBayConnector():
 
     def get_orders(self):
         url = self.base_url+self.ENDPOINT['get_orders']
-        # params = {
-        #     'filter':{
-        #         'orderfulfillmentstatus':'{NOT_STARTED|IN_PROGRESS}'
-        #     }
-        # }
-        params=None
-        lastmodifieddate = frappe.db.get_value('eBay Data', fieldname='max(ebay_modified)')
-        if lastmodifieddate:
-            # params['filter']['lastmodifieddate'] = f'[{lastmodifieddate.isoformat()}..]'
-            params = {
-                'filter':{
-                    'lastmodifieddate': f'[{lastmodifieddate.isoformat()}..]'
-                }
-            }
+        filters =['orderfulfillmentstatus:%7BNOT_STARTED%7CIN_PROGRESS%7D']
+        # params=None
+        creationdate = frappe.db.get_value('eBay Data', {}, fieldname='max(ebay_creation)')
+        if creationdate:
+            filters.append(f'creationdate:%5B{creationdate.isoformat()}.511Z..%5D')
+        params = 'filter='+ (','.join(filters))
         data = self._request('GET', url, params=params)
         self.order_data_process(data)
     
