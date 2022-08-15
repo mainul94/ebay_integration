@@ -4,7 +4,6 @@
 import hashlib
 import frappe
 from frappe.model.document import Document
-from ebaysdk.trading import Connection as Trading
 from frappe.utils.data import add_to_date, get_url, now_datetime, cint, cstr
 from frappe.utils.response import Response
 import requests
@@ -62,10 +61,6 @@ class eBaySettings(Document):
             'Authorization': "Basic {}".format(cstr(base64.b64encode(f"{self.client_id}:{self.get_password('client_secret')}".encode())))
         }
         return url, headers
-
-    # Dummy methods.
-    def fetch_orders(self):
-        pass
 
 
 @frappe.whitelist(allow_guest=True, methods=['GET'])

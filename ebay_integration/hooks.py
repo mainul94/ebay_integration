@@ -106,10 +106,10 @@ app_license = "MIT"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"ebay_integration.tasks.all"
-# 	],
+scheduler_events = {
+	"all": [
+		"ebay_integration.ebay.doctype.ebay_settings.ebay.schedule_pull_order"
+	],
 # 	"daily": [
 # 		"ebay_integration.tasks.daily"
 # 	],
@@ -122,7 +122,7 @@ app_license = "MIT"
 # 	"monthly": [
 # 		"ebay_integration.tasks.monthly"
 # 	]
-# }
+}
 
 # Testing
 # -------

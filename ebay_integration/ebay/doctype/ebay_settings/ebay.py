@@ -1,6 +1,8 @@
 import frappe
 from frappe.model.document import Document
+from frappe.utils.data import cstr, get_datetime_str
 from requests import session
+from frappe.core.page.background_jobs.background_jobs import get_info
 
 
 class eBayConnector():
@@ -35,7 +37,7 @@ class eBayConnector():
         r = self.req.request(method=method, url=url, headers=headers, json=data, params=params)
         if r.status_code==200:
             return r.json()
-        elif 400 <= r.status_code >500  and not self.retry:
+        elif 500 > r.status_code >=400  and not self.retry:
             self.retry = True
             self.conf.get_oauth_code_by_refresh_code()
             self.req.headers.update({
@@ -47,4 +49,52 @@ class eBayConnector():
 
     def get_orders(self):
         url = self.base_url+self.ENDPOINT['get_orders']
-        return self._request('GET', url)
+        # params = {
+        #     'filter':{
+        #         'orderfulfillmentstatus':'{NOT_STARTED|IN_PROGRESS}'
+        #     }
+        # }
+        params=None
+        lastmodifieddate = frappe.db.get_value('eBay Data', fieldname='max(ebay_modified)')
+        if lastmodifieddate:
+            # params['filter']['lastmodifieddate'] = f'[{lastmodifieddate.isoformat()}..]'
+            params = {
+                'filter':{
+                    'lastmodifieddate': f'[{lastmodifieddate.isoformat()}..]'
+                }
+            }
+        data = self._request('GET', url, params=params)
+        self.order_data_process(data)
+    
+    def order_data_process(self, data):
+        if not data:
+            return
+        # Process.
+        for row in data.get('orders') or []:
+            if frappe.db.exists('eBay Data', {'ebay_id': row['orderId'], 'ebay_modified': get_datetime_str(row['lastModifiedDate'])}):
+                continue
+            doc = frappe.new_doc('eBay Data')
+            doc.update({
+                'ebay_id': row['orderId'],
+                'ebay_creation': get_datetime_str(row['creationDate']),
+                'ebay_modified': get_datetime_str(row['lastModifiedDate']),
+                'data': cstr(row)
+            })
+            doc.insert()
+        # Load Next Page Data
+        if data.get('next'):
+            new_data = self._request('GET', data.get('next'))
+            self.order_data_process(new_data)
+
+
+def schedule_pull_order():
+    job_name='eBayOrderPulling'
+    if any(x['job_name'] == job_name for x in get_info() if x['status'] in ('started', 'queued')):
+        # Already another job running for this.
+        return
+    frappe.enqueue('ebay_integration.ebay.doctype.ebay_settings.ebay._pull_order', timeout=600, job_name=job_name)
+
+def _pull_order():
+    settings = frappe.get_cached_doc('eBay Settings', 'eBay Settings')
+    ebay = eBayConnector(settings)
+    ebay.get_orders()

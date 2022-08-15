@@ -1,0 +1,124 @@
+{
+ "actions": [],
+ "autoname": "eBay-.YYYY.-.MM.-.#####",
+ "creation": "2022-08-15 12:03:39.606549",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "to_doctype",
+  "ebay_id",
+  "new_name",
+  "column_break_4",
+  "ebay_creation",
+  "ebay_modified",
+  "status",
+  "section_break_5",
+  "data",
+  "error",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "Sales Order",
+   "fieldname": "to_doctype",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "To DocType",
+   "options": "DocType",
+   "reqd": 1
+  },
+  {
+   "fieldname": "ebay_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "eBay ID"
+  },
+  {
+   "fieldname": "new_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "New Name"
+  },
+  {
+   "default": "Open",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Open\nSuccess\nFailed"
+  },
+  {
+   "fieldname": "section_break_5",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "data",
+   "fieldtype": "Code",
+   "label": "Data"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "eBay Data",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ebay_creation",
+   "fieldtype": "Datetime",
+   "label": "eBay Creation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ebay_modified",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "eBay Modified",
+   "read_only": 1
+  },
+  {
+   "fieldname": "error",
+   "fieldtype": "Code",
+   "label": "Error"
+  }
+ ],
+ "in_create": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2022-08-15 14:12:40.466186",
+ "modified_by": "Administrator",
+ "module": "eBay",
+ "name": "eBay Data",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
