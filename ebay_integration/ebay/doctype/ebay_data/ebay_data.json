@@ -9,6 +9,7 @@
   "to_doctype",
   "ebay_id",
   "new_name",
+  "re_try",
   "column_break_4",
   "ebay_creation",
   "ebay_modified",
@@ -34,9 +35,11 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "eBay ID"
+   "label": "eBay ID",
+   "unique": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "new_name",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -44,6 +47,7 @@
    "label": "New Name"
   },
   {
+   "allow_on_submit": 1,
    "default": "Open",
    "fieldname": "status",
    "fieldtype": "Select",
@@ -88,15 +92,23 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "error",
    "fieldtype": "Code",
    "label": "Error"
+  },
+  {
+   "depends_on": "eval:doc.status===\"Failed\"",
+   "fieldname": "re_try",
+   "fieldtype": "Button",
+   "label": "Re Try",
+   "options": "make_order"
   }
  ],
  "in_create": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-15 14:12:40.466186",
+ "modified": "2022-08-16 19:26:35.111555",
  "modified_by": "Administrator",
  "module": "eBay",
  "name": "eBay Data",
