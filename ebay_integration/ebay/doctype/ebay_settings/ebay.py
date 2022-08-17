@@ -73,6 +73,7 @@ class eBayConnector():
                 'data': cstr(row)
             })
             doc.insert()
+            doc.submit()
         # Load Next Page Data
         if data.get('next'):
             new_data = self._request('GET', data.get('next'))
