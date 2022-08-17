@@ -4,11 +4,9 @@
 import frappe
 from frappe.model.document import Document
 from ast import literal_eval
-from frappe.utils.data import cstr, flt, get_datetime_str
+from frappe.utils.data import add_days, cstr, flt, get_datetime_str
 from erpnext import get_default_company
 from erpnext.accounts.doctype.payment_entry.payment_entry import get_payment_entry
-from erpnext.setup.utils import get_exchange_rate
-from erpnext.accounts.doctype.account.account import get_account_currency
 
 class eBayData(Document):
     def on_submit(self):
@@ -28,12 +26,14 @@ class eBayData(Document):
 
     def _new_sales_order(self):
         self.parsed_doc = self.parse_data()
+        if self.parsed_doc.get('orderFulfillmentStatus', '')=="CANCELLED" or self.parsed_doc['cancelStatus']['cancelState'] != "NONE_REQUESTED":
+            raise frappe.DataError("Order already cancelled.")
         self.order = frappe.new_doc('Sales Order')
         self._set_customer_and_address()
         self.order.set('company', get_default_company())
         self.order.set('transaction_date', self.ebay_creation)
         self.order.set('ignore_pricing_rule', 1)
-        self.order.set('delivery_date', get_datetime_str(self.parsed_doc['fulfillmentStartInstructions'][-1]['minEstimatedDeliveryDate']))
+        self.order.set('delivery_date', get_datetime_str(self.parsed_doc['fulfillmentStartInstructions'][-1]['minEstimatedDeliveryDate']) if 'minEstimatedDeliveryDate' in self.parsed_doc['fulfillmentStartInstructions'][-1] else add_days(self.order.transaction_date, 7))
         self.order.set(
             'currency', self.parsed_doc['pricingSummary']['total']['currency'])
         if 'convertedFromCurrency' in  self.parsed_doc['paymentSummary']['totalDueSeller']\
@@ -46,7 +46,9 @@ class eBayData(Document):
         self.order.insert()
         self.order.submit()
         # Make Payment
-        if self.parsed_doc['paymentSummary']['payments'][-1]['paymentStatus']=="PAID":
+        if self.parsed_doc.get('orderFulfillmentStatus', '')=="FULFILLED":
+            self.order.update_status('Closed')
+        if self.parsed_doc.get('orderPaymentStatus', '')=="PAID":
             pe = get_payment_entry(self.order.doctype, self.order.name)
             pe.reference_no = self.parsed_doc['paymentSummary']['payments'][-1]['paymentReferenceId']
             pe.reference_date = get_datetime_str(self.parsed_doc['paymentSummary']['payments'][-1]['paymentDate'])
@@ -126,11 +128,13 @@ def shipping_address_from_fulfillment(fulfilment):
         'address_line1': address['shippingStep']['shipTo']['contactAddress']['addressLine1'],
         'city': address['shippingStep']['shipTo']['contactAddress']['city'],
         'pincode': address['shippingStep']['shipTo']['contactAddress']['postalCode'],
-        'state': address['shippingStep']['shipTo']['contactAddress']['stateOrProvince'],
+        'state': address['shippingStep']['shipTo']['contactAddress']['stateOrProvince'] if 'stateOrProvince' in address['shippingStep']['shipTo']['contactAddress'] else '',
         'country': country
     }
     if address['shippingStep']['shipTo']['primaryPhone'].get('phoneNumber'):
         doc['phone'] = address['shippingStep']['shipTo']['primaryPhone'].get('phoneNumber')
+    if 'email' in  address['shippingStep']['shipTo']:
+        doc['email'] = address['shippingStep']['shipTo']['email']
     if frappe.db.exists('Address', doc):
         add_doc = frappe.get_doc('Address', doc)
     else:
